@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "942313837393",
+    "firebase_url": "https://shrapp-ec9a2.firebaseio.com",
+    "project_id": "shrapp-ec9a2",
+    "storage_bucket": "shrapp-ec9a2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942313837393:android:829932c34cc6517af33970",
+        "android_client_info": {
+          "package_name": "com.esev.flutterappcanliapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "942313837393-kr2scf0e6klpl42rdkg9nhqtm2hi1ne4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.esev.flutterappcanliapp",
+            "certificate_hash": "4c1065a662d7c6068e0dab169b463d8d40ca6b34"
+          }
+        },
+        {
+          "client_id": "942313837393-52o9bjquukj87uod5ga2ejj7d8hnmtbs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8LxpLfMsTCGFL9lV1wQr8KEGIIgQvgL0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "942313837393-52o9bjquukj87uod5ga2ejj7d8hnmtbs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
