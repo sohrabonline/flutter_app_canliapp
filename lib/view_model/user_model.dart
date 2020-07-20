@@ -183,11 +183,7 @@ class UserModel with ChangeNotifier implements AuthBase {
 
  }
 
-  Future<bool> saveMessage(Mesaj mesaj)  async{
 
-    return  await _userRepository.saveMessage(mesaj) ; //awaiti sil
-
-  }
 
   Future <List<Konusma>> getAllConservations(String userID) async{
     return await _userRepository.getAllConservations(userID);

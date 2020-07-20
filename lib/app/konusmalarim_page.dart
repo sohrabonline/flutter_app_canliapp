@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterappcanliapp/app/sohbet_page.dart';
 import 'package:flutterappcanliapp/models/konusma.dart';
 import 'package:flutterappcanliapp/models/user.dart';
+import 'package:flutterappcanliapp/view_model/chat_view_model.dart';
 import 'package:flutterappcanliapp/view_model/user_model.dart';
 import 'package:provider/provider.dart';
 
@@ -43,13 +44,14 @@ class _KonusmalarimPageState extends State<KonusmalarimPage> {
                             onTap: () {
                               Navigator.of(context, rootNavigator: true)
                                   .push(MaterialPageRoute(builder: (context) {
-                                return SohbetPage(
-                                  currentUser: userModel.user,
-                                  sohbetEdilenUser: User.idveResimAD(
+                                return ChangeNotifierProvider(create: (context){
+                                  return ChatViewModel(currentUser: userModel.user,sohbetEdilenUser: User.idveResimAD(
                                       userID: oankiKonusma.kimle_konusuyor,
                                       profilURL:
                                       oankiKonusma.konusulanUserPpURL,
-                                      userName: oankiKonusma.konusulanUserName),
+                                      userName: oankiKonusma.konusulanUserName));
+                                },
+                                  child: SohbetPage(),
                                 );
                               }));
                             },

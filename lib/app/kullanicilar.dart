@@ -93,8 +93,6 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
               create: (context){
                 return ChatViewModel(currentUser: userModel.user,sohbetEdilenUser: oankiUser); },
                child: SohbetPage(
-                currentUser: userModel.user,
-                sohbetEdilenUser: oankiUser,
               ),
             );
           }));
