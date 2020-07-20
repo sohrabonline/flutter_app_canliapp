@@ -85,6 +85,7 @@ class FirestoreDBService implements DBBase {
         .document(currentUserID + "--" + sohbetEdilenUserID)
         .collection("mesajlar")
         .orderBy("date", descending: true)
+        .limit(1)
         .snapshots();
 
     return snapshot.map((mesajListesi) => mesajListesi.documents
@@ -207,7 +208,7 @@ class FirestoreDBService implements DBBase {
           .orderBy("date", descending: true).startAfter([enSonGetirilenMesaj.date])
           .limit(getirilecekMesajSayi)
           .getDocuments();
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(Duration(milliseconds: 10));
     }
     for(DocumentSnapshot snap in querySnapshot.documents){
       Mesaj _tekMesaj=Mesaj.fromMap(snap.data);

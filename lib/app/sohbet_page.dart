@@ -28,13 +28,13 @@ class _SohbetPageState extends State<SohbetPage> {
   Widget build(BuildContext context) {
     var _userModel = Provider.of<UserModel>(context);
 
-    ChatViewModel chatViewModel = Provider.of<ChatViewModel>(context);
+    ChatViewModel state = Provider.of<ChatViewModel>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(chatViewModel.sohbetEdilenUser.userName),
+        title: Text(state.sohbetEdilenUser.userName),
       ),
-      body: chatViewModel.chatViewState == ChatViewState.Busy
+      body: state.state == ChatViewState.Busy
           ? Center(
         child: HeartbeatProgressIndicator(
           child: Icon(
@@ -138,9 +138,9 @@ class _SohbetPageState extends State<SohbetPage> {
         child: ListView.builder(
             controller: _scrollController,
             reverse: true,
-            itemCount: model.hasMore ? model.tumMesajlar.length+1 : model.tumMesajlar.length,
+            itemCount: model.hasMoreLoading ? model.tumMesajlar.length+1 : model.tumMesajlar.length,
             itemBuilder: (context, index) {
-              if (model.hasMore && model.tumMesajlar.length==index) {
+              if (model.hasMoreLoading && model.tumMesajlar.length==index) {
                 return  _yeniElemanlarYukleniyorIndicator();
               }else{
                 return chatBalloon(model.tumMesajlar[index]);
