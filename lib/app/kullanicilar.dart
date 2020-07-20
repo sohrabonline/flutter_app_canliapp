@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutterappcanliapp/app/sohbet_page.dart';
 import 'package:flutterappcanliapp/models/user.dart';
 import 'package:flutterappcanliapp/view_model/all_users_view_model.dart';
+import 'package:flutterappcanliapp/view_model/chat_view_model.dart';
 import 'package:flutterappcanliapp/view_model/user_model.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 import 'package:provider/provider.dart';
@@ -88,9 +89,13 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
         onTap: () {
           Navigator.of(context, rootNavigator: true)
               .push(MaterialPageRoute(builder: (context) {
-            return SohbetPage(
-              currentUser: userModel.user,
-              sohbetEdilenUser: oankiUser,
+            return ChangeNotifierProvider(
+              create: (context){
+                return ChatViewModel(currentUser: userModel.user,sohbetEdilenUser: oankiUser); },
+               child: SohbetPage(
+                currentUser: userModel.user,
+                sohbetEdilenUser: oankiUser,
+              ),
             );
           }));
         },
