@@ -39,7 +39,7 @@ class AllUserViewModel with ChangeNotifier {
     }
 
     if (yeniElementGelir) {
-      debugPrint("yeni element gelir gozdeee.");
+      debugPrint("yeni element gelir gozde.");
     } else {
       state = AllUseriewState.Busy;
     }
