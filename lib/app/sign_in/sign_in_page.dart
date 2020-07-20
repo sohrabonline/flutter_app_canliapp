@@ -96,17 +96,7 @@ class SignInPage extends StatelessWidget {
                 textColor: Colors.white,
               ),
 
-              SocialLoginButton(
-                butonText: "Qonaq kimi daxil ol",
-                butonColor: Colors.green,
-                butonIcon: Icon(Icons.supervised_user_circle,
-                    color: Colors.white, size: 35),
-                onPressed: () {
-                  signInAsGuide(context);
-                },
-                radius: 10,
-                textColor: Colors.white,
-              )
+
             ],
           ),
         ),

@@ -114,7 +114,7 @@ class _EmailveSifreLoginPageState extends State<EmailveSifreLoginPage> {
                             ),
                             TextFormField(
                               keyboardType: TextInputType.emailAddress,
-                              initialValue: "e@ee.ee",
+                              //initialValue: "e@ee.ee",
                               onSaved: (value) {
                                 _email = value.toString();
                               },
@@ -131,7 +131,7 @@ class _EmailveSifreLoginPageState extends State<EmailveSifreLoginPage> {
                               height: 8,
                             ),
                             TextFormField(
-                              initialValue: "123456",
+                           //   initialValue: "123456",
                               obscureText: true,
                               onSaved: (value) {
                                 _sifre = value.toString();

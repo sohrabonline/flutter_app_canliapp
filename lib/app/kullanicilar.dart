@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutterappcanliapp/app/sohbet_page.dart';
 import 'package:flutterappcanliapp/models/user.dart';
+import 'package:flutterappcanliapp/view_model/all_users_view_model.dart';
 import 'package:flutterappcanliapp/view_model/user_model.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 import 'package:provider/provider.dart';
@@ -14,28 +15,27 @@ class KullanicilarPage extends StatefulWidget {
 
 class _KullanicilarPageState extends State<KullanicilarPage> {
   ScrollController _scrollController = ScrollController();
-  List<User> tumKullanicilar;
   bool isLoading = false;
-  bool hasMore = true;
-  User _enSonGetirilenUser;
-  int _getirilecekUserSayi = 9;
 
   @override
   void initState() {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      getUser();
+      getMoreUser();
     });
 
     _scrollController.addListener(() {
-      if (_scrollController.position.atEdge) {
-        if (_scrollController.position == 0) {
-          print("En tepedeyiz");
-        } else {
-          print("listenin sonundayız");
-          getUser();
-        }
-      }
+      _listeScrollListener();
     });
+  }
+
+  void _listeScrollListener() {
+     if (_scrollController.position.atEdge) {
+      if (_scrollController.position == 0) {
+        debugPrint("en ust");
+      } else {
+        getMoreUser();
+      }
+    }
   }
 
   @override
@@ -44,17 +44,39 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
         appBar: AppBar(
           title: Text("İstifadəçilər"),
         ),
-        body: tumKullanicilar == null
-            ? Center(
+        body:
+            Consumer<AllUserViewModel>(builder: (context, allUserModel, child) {
+          if (allUserModel.state == AllUseriewState.Busy) {
+            return Center(
                 child: JumpingText(
-                "Yüklənir...",
-                style: TextStyle(color: Colors.blue, fontSize: 20),
-              ))
-            : _kullaniciListesiniOlustur());
+              "Yüklənir...",
+              style: TextStyle(color: Colors.blue, fontSize: 20),
+            ));
+          } else if (allUserModel.state == AllUseriewState.Loaded) {
+            return ListView.builder(
+              itemCount: allUserModel.tumKullanicilar.length,
+              controller: _scrollController,
+              itemBuilder: (context, index) {
+                if (allUserModel.hasMore
+               && index == allUserModel.tumKullanicilar.length) {
+                  return _yeniElementlerYuklenirIndicator();
+                }
+else{
+                return lisTileGetir(index);}
+              },
+            );
+          } else {
+            return Container();
+          }
+        }));
   }
 
+/*
   getUser() async {
     UserModel userModel = Provider.of<UserModel>(context, listen: false);
+    AllUserViewModel allUserViewModel =
+        Provider.of<AllUserViewModel>(context, listen: false);
+
     if (!hasMore) {
       debugPrint("***** getirelecek yoxdu ona gore firebase yorma");
       return;
@@ -72,13 +94,14 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
         _enSonGetirilenUser, _getirilecekUserSayi);
 
     if (_enSonGetirilenUser == null) {
-      tumKullanicilar = [];
-      tumKullanicilar.addAll(users);
+      allUserViewModel.tumKullanicilar = [];
+      allUserViewModel.tumKullanicilar.addAll(users);
     } else {
-      tumKullanicilar.addAll(users); //addAll ve add in ferqine bax
+      allUserViewModel.tumKullanicilar
+          .addAll(users); //addAll ve add in ferqine bax
     }
 
-    _enSonGetirilenUser = tumKullanicilar.last;
+    _enSonGetirilenUser = allUserViewModel.tumKullanicilar.last;
     print("son " + _enSonGetirilenUser.userName);
 
     if (users.length < _getirilecekUserSayi) {
@@ -89,6 +112,7 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
       isLoading == false;
     });
   }
+
 
   _kullaniciListesiniOlustur() {
     if (tumKullanicilar.length > 1) {
@@ -139,9 +163,12 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
     }
   }
 
+ */
+
   Widget lisTileGetir(int index) {
     UserModel userModel = Provider.of<UserModel>(context);
-    User oankiUser = tumKullanicilar[index];
+    AllUserViewModel allUserViewModel = Provider.of<AllUserViewModel>(context);
+    User oankiUser = allUserViewModel.tumKullanicilar[index];
     if (oankiUser.userID == userModel.user.userID) {
       return Container();
     }
@@ -176,7 +203,7 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
                   backgroundImage: NetworkImage(oankiUser.profilURL),
                 ),
               ),
-              title: Text(tumKullanicilar[index].userName),
+              title: Text(allUserViewModel.tumKullanicilar[index].userName),
             ),
           ),
           actions: <Widget>[
@@ -213,18 +240,20 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
   }
 
   Future<Null> _refresh() async {
-    hasMore = true;
-    _enSonGetirilenUser = null;
-    getUser();
+    //hasMore = true;
+    //_enSonGetirilenUser = null;
+    getMoreUser();
   }
 
+
   _yeniElementlerYuklenirIndicator() {
+    AllUserViewModel allUserViewModel=Provider.of<AllUserViewModel>(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Center(
         child: Opacity(
           opacity: 1, //dersdde burani isLoading ? 1: 0        eliyib
-          child: hasMore //dersdde burani isLoading eliyib
+          child: allUserViewModel.hasMore //dersdde burani isLoading eliyib
               ? JumpingText(
                   "Yüklənir...",
                   style: TextStyle(color: Colors.blue, fontSize: 20),
@@ -233,5 +262,15 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
         ),
       ),
     );
+  }
+
+  getMoreUser() async {
+    if (isLoading == false) {
+      isLoading = true;
+      AllUserViewModel allUserViewModel =
+          Provider.of<AllUserViewModel>(context, listen: false);
+      await allUserViewModel.getMoreUser();
+      isLoading = false;
+    }
   }
 }

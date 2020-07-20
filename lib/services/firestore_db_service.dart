@@ -180,7 +180,7 @@ class FirestoreDBService implements DBBase {
     for (var snap in querySnapshot.documents) {
       User _tekUser = User.fromMap(snap.data);
       tumKullanicilar.add(_tekUser);
-      print("gelen ad: " + _tekUser.userName);
+
     }
 
     return tumKullanicilar;
