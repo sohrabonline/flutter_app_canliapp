@@ -61,7 +61,6 @@ class AllUserViewModel with ChangeNotifier {
 
  Future<void> getMoreUser() async {
     if (_hasMore) {
-      _tumKullanicilar=[];
       getUserWithPaginationg(_enSonGetirilenUser, true);
       debugPrint("daha element **var**");
     }  else{
@@ -69,4 +68,11 @@ class AllUserViewModel with ChangeNotifier {
     }await Future.delayed(Duration(seconds: 2));
 
   }
+  Future<Null> refresh() async {
+      _hasMore = true;
+      _enSonGetirilenUser = null;
+      _tumKullanicilar = [];
+      getUserWithPaginationg(_enSonGetirilenUser, true);
+    }
+
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutterappcanliapp/app/sohbet_page.dart';
 import 'package:flutterappcanliapp/models/user.dart';
@@ -19,22 +18,16 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
 
   @override
   void initState() {
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      getMoreUser();
-    });
-
-    _scrollController.addListener(() {
-      _listeScrollListener();
-    });
+    super.initState();
+    _scrollController.addListener(_listeScrollListener);
   }
 
   void _listeScrollListener() {
-     if (_scrollController.position.atEdge) {
-      if (_scrollController.position == 0) {
-        debugPrint("en ust");
-      } else {
-        getMoreUser();
-      }
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      print("Listenin en altındayız");
+      getMoreUser();
     }
   }
 
@@ -53,17 +46,22 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
               style: TextStyle(color: Colors.blue, fontSize: 20),
             ));
           } else if (allUserModel.state == AllUseriewState.Loaded) {
-            return ListView.builder(
-              itemCount: allUserModel.tumKullanicilar.length,
-              controller: _scrollController,
-              itemBuilder: (context, index) {
-                if (allUserModel.hasMore
-               && index == allUserModel.tumKullanicilar.length) {
-                  return _yeniElementlerYuklenirIndicator();
-                }
-else{
-                return lisTileGetir(index);}
-              },
+            return RefreshIndicator(
+              onRefresh: allUserModel.refresh,
+              child: ListView.builder(
+                itemCount: allUserModel.hasMore ? allUserModel.tumKullanicilar.length+1 : allUserModel.tumKullanicilar.length,
+                controller: _scrollController,
+                itemBuilder: (context, index) {
+                  if (allUserModel.tumKullanicilar.length == 1) {
+                    return _noUserWidget();
+                  } else if (allUserModel.hasMore &&
+                      index == allUserModel.tumKullanicilar.length) {
+                    return _yeniElementlerYuklenirIndicator();
+                  } else {
+                    return lisTileGetir(index);
+                  }
+                },
+              ),
             );
           } else {
             return Container();
@@ -71,99 +69,6 @@ else{
         }));
   }
 
-/*
-  getUser() async {
-    UserModel userModel = Provider.of<UserModel>(context, listen: false);
-    AllUserViewModel allUserViewModel =
-        Provider.of<AllUserViewModel>(context, listen: false);
-
-    if (!hasMore) {
-      debugPrint("***** getirelecek yoxdu ona gore firebase yorma");
-      return;
-    }
-
-    if (isLoading) {
-      return;
-    }
-
-    setState(() {
-      isLoading == true;
-    });
-
-    List<User> users = await userModel.getUserWithPagination(
-        _enSonGetirilenUser, _getirilecekUserSayi);
-
-    if (_enSonGetirilenUser == null) {
-      allUserViewModel.tumKullanicilar = [];
-      allUserViewModel.tumKullanicilar.addAll(users);
-    } else {
-      allUserViewModel.tumKullanicilar
-          .addAll(users); //addAll ve add in ferqine bax
-    }
-
-    _enSonGetirilenUser = allUserViewModel.tumKullanicilar.last;
-    print("son " + _enSonGetirilenUser.userName);
-
-    if (users.length < _getirilecekUserSayi) {
-      hasMore = false;
-    }
-
-    setState(() {
-      isLoading == false;
-    });
-  }
-
-
-  _kullaniciListesiniOlustur() {
-    if (tumKullanicilar.length > 1) {
-      return RefreshIndicator(
-        onRefresh: _refresh,
-        child: ListView.builder(
-          itemCount: tumKullanicilar.length + 1,
-          controller: _scrollController,
-          itemBuilder: (context, index) {
-            if (index == tumKullanicilar.length) {
-              return _yeniElementlerYuklenirIndicator();
-            }
-
-            return lisTileGetir(index);
-          },
-        ),
-      );
-    } else {
-      return RefreshIndicator(
-        onRefresh: _refresh,
-        child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          child: Container(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.do_not_disturb_off,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "Hələ ki, istifadəçi yoxdur...",
-                    style: TextStyle(fontSize: 20, color: Colors.grey),
-                  )
-                ],
-              ),
-            ),
-            height: MediaQuery.of(context).size.height - 150,
-          ),
-        ),
-      );
-    }
-  }
-
- */
 
   Widget lisTileGetir(int index) {
     UserModel userModel = Provider.of<UserModel>(context);
@@ -239,38 +144,62 @@ else{
     );
   }
 
-  Future<Null> _refresh() async {
-    //hasMore = true;
-    //_enSonGetirilenUser = null;
-    getMoreUser();
-  }
-
 
   _yeniElementlerYuklenirIndicator() {
-    AllUserViewModel allUserViewModel=Provider.of<AllUserViewModel>(context);
+    AllUserViewModel allUserViewModel = Provider.of<AllUserViewModel>(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Center(
-        child: Opacity(
-          opacity: 1, //dersdde burani isLoading ? 1: 0        eliyib
-          child: allUserViewModel.hasMore //dersdde burani isLoading eliyib
-              ? JumpingText(
-                  "Yüklənir...",
-                  style: TextStyle(color: Colors.blue, fontSize: 20),
-                )
-              : null,
-        ),
+        child:JumpingText(
+                "Yüklənir...",
+                style: TextStyle(color: Colors.blue, fontSize: 20),
+              )
+           ,
       ),
     );
   }
 
-  getMoreUser() async {
+  void getMoreUser() async {
     if (isLoading == false) {
       isLoading = true;
-      AllUserViewModel allUserViewModel =
+      final _tumKullanicilarViewModel =
           Provider.of<AllUserViewModel>(context, listen: false);
-      await allUserViewModel.getMoreUser();
+      await _tumKullanicilarViewModel.getMoreUser();
       isLoading = false;
     }
+  }
+
+  Widget _noUserWidget() {
+    AllUserViewModel allUserViewModel = Provider.of<AllUserViewModel>(context);
+
+    return RefreshIndicator(
+      onRefresh: allUserViewModel.refresh,
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Container(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  Icons.do_not_disturb_off,
+                  size: 80,
+                  color: Colors.grey,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Hələ ki, istifadəçi yoxdur...",
+                  style: TextStyle(fontSize: 20, color: Colors.grey),
+                )
+              ],
+            ),
+          ),
+          height: MediaQuery.of(context).size.height - 150,
+        ),
+      ),
+    );
   }
 }
