@@ -2,6 +2,7 @@
 <resources>
     <string name="facebook_app_id">922288351572313</string>
     <string name="fb_login_protocol_scheme">fb922288351572313</string>
+    <string name="default_notification_channel_id">default</string>
     <string name="app_name">SHRApp</string>
 
 </resources>
